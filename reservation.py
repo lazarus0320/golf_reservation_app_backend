@@ -5,6 +5,8 @@ from selenium.common.exceptions import TimeoutException
 from datetime import datetime
 import time
 from custom_exception import NoAvailableSlotsException
+from selenium.webdriver.common.alert import Alert
+
 
 
 def find_closest_time(bk_time_list, futureTime):  # 최적시간 찾기
@@ -130,8 +132,36 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                                         cnt4 = radio_element.find_element(
                                             By.XPATH, '//*[@id="form-create"]/div[6]/div/label[2]')
                                         cnt4.click()
-                                    print("예약 완료!")
-                                    return
+                                    
+                                    submit_btn = driver.find_element(By.XPATH, '//*[@id="form-create"]/div[9]/button[1]');
+                                    submit_btn.click()
+                                    
+                                    # 모달창이 나타나는 부분
+                                    # Wait for the alert to appear
+                                    try:
+                                        alert1 = WebDriverWait(driver, 5).until(EC.alert_is_present())
+                                        # Switch to the alert and accept it (click "확인")
+                                        alert1.accept()
+                                        print("모달창 확인 버튼 클릭 완료!")
+                                        
+                                        try:
+                                            # Wait for the element to be present in the DOM
+                                            reservation_result_table = WebDriverWait(driver, 5).until(
+                                                EC.presence_of_element_located((By.XPATH, '//*[@id="booking-history"]/table[1]'))
+                                            )
+                                            print("예약 완료!")
+                                            return
+                                            
+                                        except TimeoutException:
+                                            print("예약 결과 테이블을 불러오는데 실패했습니다.")
+                                            driver.close()
+                                            return "예약 결과 테이블을 불러오는데 실패했습니다.", 500
+                                            # Handle the timeout exception as needed
+                                    except TimeoutException:
+                                        print("모달창이 나타나지 않았거나 처리에 실패했습니다.")
+                                        driver.close()
+                                        return '모달창이 나타나지 않았거나 처리에 실패했습니다.', 500
+                                    
                 else:
                     print('cannot find matched a_text.. ㅜ.ㅜ')
                     if isWednesday:
