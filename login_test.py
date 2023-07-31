@@ -25,9 +25,10 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
     options.add_argument('--disable-extensions')  # Disable extensions
     # Disable shared memory usage
     options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--start-fullscreen') # 전체화면
     # prefs = {"profile.managed_default_content_settings.images": 2}  # Disable loading images
     # options.add_experimental_option("prefs", prefs)
-    options.add_experimental_option("detach", True)
+    # options.add_experimental_option("detach", True)
 
 
     driver = webdriver.Chrome(options=options)
@@ -104,8 +105,13 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
         target_month = target_date.strftime("%m")
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
-        reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday)
+        if reservation_test(driver, target_day, elements,
+                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
+            
 
         print("2. 10일 뒤 토요일 예약 진행")
         year = int(nextSaturday.split('년')[0].strip())
@@ -116,8 +122,12 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
         target_month = target_date.strftime("%m")
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
-        reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday)
+        if reservation_test(driver, target_day, elements,
+                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
 
         print("3. 11일 뒤 일요일 예약 진행")
         year = int(nextSunday.split('년')[0].strip())
@@ -128,8 +138,12 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
         target_month = target_date.strftime("%m")
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
-        reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday)
+        if reservation_test(driver, target_day, elements,
+                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
 
         driver.close()
         raise NoAvailableSlotsException('모든 날짜의 예약에 실패했습니다... 예약 가능 날짜가 없습니다.')

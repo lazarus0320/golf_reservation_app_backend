@@ -67,6 +67,12 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                             try:
                                 td_element.click()
                             except Exception as e:
+                                if isWednesday:
+                                    print('exception 테스트-------------------')
+                                    closeBtn = WebDriverWait(driver, 5).until(EC.element_to_be_clickable(
+                                    (By.XPATH, '//*[@id="modal-view"]/div/div/div[1]/button/span/i')))
+                                    closeBtn.click()
+                                    return
                                 print(
                                     f"Error occurred while clicking on td_element: {e}")
                                 driver.close()
@@ -80,6 +86,12 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                                 tr_elements_load = WebDriverWait(driver, 5).until(EC.element_to_be_clickable(
                                     (By.XPATH, '//*[@id="booking-index"]/div[2]/div[2]/div/table/tbody/tr[1]/td[5]/button[1]')))
                             except TimeoutException:
+                                if isWednesday:
+                                    print('exception 테스트-------------------')
+                                    closeBtn = WebDriverWait(driver, 5).until(EC.element_to_be_clickable(
+                                    (By.XPATH, '//*[@id="modal-view"]/div/div/div[1]/button/span/i')))
+                                    closeBtn.click()
+                                    return
                                 print(
                                     "Timeout occurred. Element tr_elements_load was not found within the specified time.")
                                 driver.close()
@@ -107,6 +119,7 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                                 print("Closest time:", closest_time)
                             else:
                                 print("There is no available time slot.")
+                                return
 
                             # 가장 가까운 시간의 tr요소에서 예약 버튼 찾아서 클릭
                             for tr in tr_elements:
@@ -146,18 +159,27 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                                         
                                         try:
                                             # Wait for the element to be present in the DOM
+                                            print("예약 완료 테이블 탐색중...")
                                             reservation_result_table = WebDriverWait(driver, 5).until(
                                                 EC.presence_of_element_located((By.XPATH, '//*[@id="booking-history"]/table[1]'))
                                             )
                                             print("예약 완료!")
-                                            return
+                                            return "예약 성공"
                                             
                                         except TimeoutException:
+                                            if isWednesday:
+                                                closeBtn = WebDriverWait(driver, 5).until(EC.element_to_be_clickable(
+                                                (By.XPATH, '//*[@id="modal-view"]/div/div/div[1]/button/span/i')))
+                                                closeBtn.click()
+                                                return
                                             print("예약 결과 테이블을 불러오는데 실패했습니다.")
                                             driver.close()
                                             return "예약 결과 테이블을 불러오는데 실패했습니다.", 500
                                             # Handle the timeout exception as needed
                                     except TimeoutException:
+                                        if isWednesday:
+                                            print('exception 테스트-------------------')
+                                            return
                                         print("모달창이 나타나지 않았거나 처리에 실패했습니다.")
                                         driver.close()
                                         return '모달창이 나타나지 않았거나 처리에 실패했습니다.', 500
@@ -165,6 +187,7 @@ def reservation_test(driver, target_day, elements, target_month, futureTime, per
                 else:
                     print('cannot find matched a_text.. ㅜ.ㅜ')
                     if isWednesday:
+                        print('exception 테스트-------------------')
                         return
                     else:
                         driver.close()
