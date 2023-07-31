@@ -5,9 +5,26 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/reservation', method=['POST'])
+def reservation_route():
+    try:
+        print(request.form)
+        id = request.form.get('id')
+        pw = request.form.get('pw')
+        personnel = request.form.get('personnel')
+        nextFuture = request.form.get('nextFuture')
+        nextSaturday = request.form.get('nextSaturday')
+        nextSunday = request.form.get('nextSunday')
+        futureTime = request.form.get('futureTime')
+        wednesdayCheck = request.form.get('wednesdayCheck')
+        
+    except Exception as e:
+        error_message = str(e)
+        response = {'success': False, 'error': error_message}
+        return jsonify(response), 500
+
 
 @app.route('/login', methods=['POST'])
-# @celery.task()
 def login_route():
     try:
         print(request.form)
