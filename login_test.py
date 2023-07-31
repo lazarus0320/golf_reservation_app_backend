@@ -4,11 +4,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-# from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 from datetime import datetime, timedelta
 from reservation import reservation_test
 from custom_exception import NoAvailableSlotsException
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromeService
 
 
 def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck):
@@ -19,14 +21,14 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
     # options.add_argument('--headless=new')  # Run in headless mode
     options.add_argument('--disable-gpu')  # Disable GPU acceleration
     options.add_argument('--no-sandbox')  # Disable the sandbox mode
-
+    # options.add_argument("--headless=new")
     options.add_argument('--disable-extensions')  # Disable extensions
     # Disable shared memory usage
     options.add_argument('--disable-dev-shm-usage')
     # prefs = {"profile.managed_default_content_settings.images": 2}  # Disable loading images
     # options.add_experimental_option("prefs", prefs)
+    options.add_experimental_option("detach", True)
 
-    # service = service(ChromeDriverManager().install())
 
     driver = webdriver.Chrome(options=options)
 
