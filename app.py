@@ -7,18 +7,18 @@ app = Flask(__name__)
 CORS(app)
 
 # Function to insert data into the Reservation table
-def insert_reservation_data(id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck):
+def insert_reservation_data(id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
     conn = sqlite3.connect("C:/golf_db/golf_db.db")
     cursor = conn.cursor()
 
     # Prepare the SQL query
     query = """
-    INSERT INTO Reservation (uid, upw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Reservation (uid, upw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     # Execute the query with the data provided
-    cursor.execute(query, (id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck))
+    cursor.execute(query, (id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck))
 
     # Commit the changes and close the connection
     conn.commit()
@@ -74,10 +74,12 @@ def reservation_route():
         nextSaturday = request.form.get('nextSaturday')
         nextSunday = request.form.get('nextSunday')
         futureTime = request.form.get('futureTime')
+        saturdayTime = request.form.get('saturdayTime')
+        sundayTime = request.form.get('sundayTime')
         wednesdayCheck = request.form.get('wednesdayCheck')
         
         # sqlite db 연결
-        insert_reservation_data(id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck)
+        insert_reservation_data(id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
 
         return jsonify({'success': True}), 200
         
@@ -101,10 +103,12 @@ def reservation_table():
                 'upw': row[2],
                 'personnel': row[3],
                 'nextFuture': row[4],
-                'nextSaturday': row[5],
-                'nextSunday': row[6],
-                'futureTime': row[7],
-                'wednesdayCheck': row[8],
+                'futureTime': row[5],
+                'nextSaturday': row[6],
+                'saturdayTime': row[7],
+                'nextSunday': row[8],
+                'sundayTime': row[9],
+                'wednesdayCheck': row[10],
             }
             reservations.append(reservation)
 
