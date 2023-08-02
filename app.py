@@ -2,6 +2,52 @@ from flask import Flask, request, jsonify
 import login_test  # 이것은 앞에서 만든 Selenium 스크립트입니다.
 from flask_cors import CORS
 import sqlite3
+import schedule, threading, time
+from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+
+# Your existing Flask code...
+
+def check_and_delete_reservations():
+    try:
+        # Get the current date and time
+        current_datetime = datetime.now()
+        print("Current Timestamp:", current_datetime)
+        # Get all rows from the Reservation table
+        reservation_data = get_reservation_data()
+        print(reservation_data)
+        # Iterate through the rows to check conditions and delete if needed
+        for row in reservation_data:
+            next_future_date_str = row[4]  # Assuming nextFuture is a string representing a date
+            future_time_str = row[5]       # Assuming futureTime is a string representing time
+
+            # Convert next_future_date_str and future_time_str to datetime objects
+            year = int(next_future_date_str.split('년')[0].strip())
+            month = int(next_future_date_str.split('년')[1].split('월')[0].strip())
+            day = int(next_future_date_str.split('월')[1].split('일')[0].strip())
+
+            hour, minute = map(int, future_time_str.split(':'))
+            reservation_datetime = datetime(year, month, day, hour, minute)
+
+            # Combine the date and time to get the complete datetime
+            # reservation_datetime = datetime.combine(next_future_datetime, future_time_datetime.time())
+            print(f'current_datetime: {current_datetime}, reservation_datetime: {reservation_datetime}')
+
+            if current_datetime >= reservation_datetime:
+                # Perform the login_test method (or any other action you want)
+                cookies, elapsed_time = login_test.login_test(
+                    "https://www.debeach.co.kr/",
+                    row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]
+                )
+                # After performing the action, delete the reservation row
+                delete_reservation_data(row[0])
+                return str(elapsed_time), 200
+
+    except Exception as e:
+        delete_reservation_data(row[0])
+        print('Error:', e)
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -41,7 +87,7 @@ def get_reservation_data():
 
     # Close the connection
     conn.close()
-
+    print(f'rows: {rows}')
     return rows
 
 # Function to delete a reservation from the Reservation table
@@ -122,7 +168,7 @@ def reservation_table():
     
 
 @app.route('/login', methods=['POST'])
-def login_route():
+def login_route(): # 스케줄링 기능 없이 로그인 및 예약 테스트
     try:
         print(request.form)
         id = request.form.get('id')
@@ -133,9 +179,11 @@ def login_route():
         nextSunday = request.form.get('nextSunday')
         futureTime = request.form.get('futureTime')
         wednesdayCheck = request.form.get('wednesdayCheck')
+        saturdayTime = request.form.get('saturdayTime')
+        sundayTime = request.form.get('sundayTime')
 
         cookies, elapsed_time = login_test.login_test(
-            "https://www.debeach.co.kr/", id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck)
+            "https://www.debeach.co.kr/", id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
 
         return str(elapsed_time), 200
 
@@ -158,6 +206,15 @@ def reservation_cancel_route(id):
         response = {'success': False, 'error': error_message}
         return jsonify(response), 500
 
+
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(check_and_delete_reservations, trigger='cron', second='0')
+scheduler.start()
+        
 if __name__ == '__main__':
+    
+
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
+    # Schedule the check_and_delete_reservations function to run every minute
+    

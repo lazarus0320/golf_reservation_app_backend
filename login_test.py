@@ -13,11 +13,11 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.service import Service as ChromeService
 
 
-def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, futureTime, wednesdayCheck):
+def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
 
     # driver = webdriver.Chrome() # or you can use Chrome()
 
-    options = Options()
+    options = Options() # 크롬 드라이버 자동 설치 적용됨.
     # options.add_argument('--headless=new')  # Run in headless mode
     options.add_argument('--disable-gpu')  # Disable GPU acceleration
     options.add_argument('--no-sandbox')  # Disable the sandbox mode
@@ -123,7 +123,7 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
         if reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+                         target_month, saturdayTime, personnel, isWednesday) == "예약 성공":
             driver.close()
             end_time = time.time()
             elapsed_time = end_time - start_time
@@ -139,7 +139,7 @@ def login_test(url, id, pw, personnel, nextFuture, nextSaturday, nextSunday, fut
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
         if reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+                         target_month, sundayTime, personnel, isWednesday) == "예약 성공":
             driver.close()
             end_time = time.time()
             elapsed_time = end_time - start_time
