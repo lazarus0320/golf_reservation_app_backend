@@ -13,11 +13,18 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.service import Service as ChromeService
 
 
+def wait_until_9_am():
+    while True:
+        current_time = datetime.now().time()
+        if current_time.hour == 9:
+            break
+
+
 def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
 
     # driver = webdriver.Chrome() # or you can use Chrome()
 
-    options = Options() # 크롬 드라이버 자동 설치 적용됨.
+    options = Options()  # 크롬 드라이버 자동 설치 적용됨.
     # options.add_argument('--headless=new')  # Run in headless mode
     options.add_argument('--disable-gpu')  # Disable GPU acceleration
     options.add_argument('--no-sandbox')  # Disable the sandbox mode
@@ -25,11 +32,10 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
     options.add_argument('--disable-extensions')  # Disable extensions
     # Disable shared memory usage
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--start-fullscreen') # 전체화면
+    options.add_argument('--start-fullscreen')  # 전체화면
     # prefs = {"profile.managed_default_content_settings.images": 2}  # Disable loading images
     # options.add_experimental_option("prefs", prefs)
     # options.add_experimental_option("detach", True)
-
 
     driver = webdriver.Chrome(options=options)
 
@@ -89,6 +95,8 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
 
     elements = driver.find_elements(By.CLASS_NAME, 'col-xs-5')
 
+    # 현재시간이 9시가 될때까지 대기
+    wait_until_9_am()
     # 토, 일은 예약 안함
 
     if wednesdayCheck == '3':  # 월, 화 , 목, 금. 주말 예외처리는 프론트에서 해야함
@@ -106,12 +114,11 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
         if reservation_test(driver, target_day, elements,
-                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
+                            target_month, futureTime, personnel, isWednesday) == "예약 성공":
             driver.close()
             end_time = time.time()
             elapsed_time = end_time - start_time
             return cookies, elapsed_time
-            
 
         print("2. 10일 뒤 토요일 예약 진행")
         year = int(nextSaturday.split('년')[0].strip())
@@ -123,7 +130,7 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
         if reservation_test(driver, target_day, elements,
-                         target_month, saturdayTime, personnel, isWednesday) == "예약 성공":
+                            target_month, saturdayTime, personnel, isWednesday) == "예약 성공":
             driver.close()
             end_time = time.time()
             elapsed_time = end_time - start_time
@@ -139,7 +146,7 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
         target_day = int(target_date.strftime("%d"))
         print(target_month, target_day)
         if reservation_test(driver, target_day, elements,
-                         target_month, sundayTime, personnel, isWednesday) == "예약 성공":
+                            target_month, sundayTime, personnel, isWednesday) == "예약 성공":
             driver.close()
             end_time = time.time()
             elapsed_time = end_time - start_time
