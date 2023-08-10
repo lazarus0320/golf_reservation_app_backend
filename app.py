@@ -19,8 +19,7 @@ def check_and_delete_reservations():
         print(reservation_data)
         # Iterate through the rows to check conditions and delete if needed
         for row in reservation_data:
-            # selectedDay = datetime.strptime(row[4][:-14], '%Y-%m-%d')
-            selectedDay = datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')
+            selectedDay = datetime.strptime(row[4], '%Y-%m-%d')
             # next_future_date_str = row[4]  # Assuming nextFuture is a string representing a date
             # future_time_str = row[5]       # Assuming futureTime is a string representing time
 
@@ -40,6 +39,7 @@ def check_and_delete_reservations():
             # ! 코드 수정: 로그인 진행 시간을 09:00로 지정
 
             # 테스트 시에 and 이후 제거and current_datetime.hour == 9
+            # and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30
             if current_datetime.day == selectedDay.day and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30:
                 # Perform the login_test method (or any other action you want)
                 cookies, elapsed_time = login_test.login_test(
@@ -51,7 +51,7 @@ def check_and_delete_reservations():
                 return str(elapsed_time), 200
 
     except Exception as e:
-        # delete_reservation_data(row[0])
+        delete_reservation_data(row[0])
         print('Error:', e)
 
 
@@ -226,8 +226,8 @@ scheduler = BackgroundScheduler(daemon=True)
 scheduler.add_job(check_and_delete_reservations,
                   trigger='cron', hour='*', minute='59', second='30')
 # scheduler.add_job(check_and_delete_reservations,
-#                   'interval', seconds=5)
-scheduler.start()
+#                   'interval', seconds=50)
+# scheduler.start()
 
 if __name__ == '__main__':
 

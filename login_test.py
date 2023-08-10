@@ -96,7 +96,7 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
     elements = driver.find_elements(By.CLASS_NAME, 'col-xs-5')
 
     # 현재시간이 9시가 될때까지 대기
-    wait_until_9_am()
+    # wait_until_9_am()
     # 토, 일은 예약 안함
 
     if wednesdayCheck == '3':  # 월, 화 , 목, 금. 주말 예외처리는 프론트에서 해야함
