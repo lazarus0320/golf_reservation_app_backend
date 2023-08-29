@@ -12,6 +12,8 @@ from custom_exception import NoAvailableSlotsException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.service import Service as ChromeService
 
+# 08:59:30에 로그인이 진행되었으면 09:00:00까지 대기함
+
 
 def wait_until_9_am():
     while True:
@@ -21,27 +23,21 @@ def wait_until_9_am():
 
 
 def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
+    # 08:59:30에 로그인 매크로 실행됨.
 
-    # driver = webdriver.Chrome() # or you can use Chrome()
-
-    options = Options()  # 크롬 드라이버 자동 설치 적용됨.
-    # options.add_argument('--headless=new')  # Run in headless mode
+    options = Options()  # 크롬 드라이버 자동 설치 적용됨. 최신 버전으로 항상 호환성 유지됨
     options.add_argument('--disable-gpu')  # Disable GPU acceleration
     options.add_argument('--no-sandbox')  # Disable the sandbox mode
-    # options.add_argument("--headless=new")
     options.add_argument('--disable-extensions')  # Disable extensions
     # Disable shared memory usage
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--start-fullscreen')  # 전체화면
-    # prefs = {"profile.managed_default_content_settings.images": 2}  # Disable loading images
-    # options.add_experimental_option("prefs", prefs)
-    # options.add_experimental_option("detach", True)
 
     driver = webdriver.Chrome(options=options)
 
     driver.get(url)
 
-    # 새창으로 열리는 팝업 전부 닫기
+    # 만약 드비치 홈페이지에 윈도우 폼 형태의 팝업이 생길 경우 필요한 코드
     # tabs = driver.window_handles
     # print(tabs)
     # while len(tabs) != 1:
@@ -56,7 +52,7 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
 
     element.click()
 
-    # 사전에 지정된 ID ,PW 정보로 로그인 시도
+    #  ID ,PW 정보로 로그인 시도
     username_field = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable(
             (By.XPATH, '//*[@id="content-main"]/form/div/div[1]/div[3]/div[1]/ul/li[1]/div/input'))
@@ -96,10 +92,9 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
     elements = driver.find_elements(By.CLASS_NAME, 'col-xs-5')
 
     # 현재시간이 9시가 될때까지 대기
-    # wait_until_9_am()
-    # 토, 일은 예약 안함
+    wait_until_9_am()
 
-    if wednesdayCheck == '3':  # 월, 화 , 목, 금. 주말 예외처리는 프론트에서 해야함
+    if wednesdayCheck == '3':  # 수요일 예약의 경우
         print("수요일 예약 선택")
 
         print("1. 14일 뒤 수요일 예약 진행")
@@ -168,7 +163,9 @@ def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, sat
         reservation_test(driver, target_day, elements,
                          target_month, futureTime, personnel, isWednesday)
 
-    # 시간측정 끝
+    # 주말의 경우는 프론트에서 예외처리를 해두었음.
+
+    # 시간측정한 값과 함께 반환
     driver.close()
     end_time = time.time()
     elapsed_time = end_time - start_time

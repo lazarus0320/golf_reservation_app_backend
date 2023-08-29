@@ -1,52 +1,50 @@
 from flask import Flask, request, jsonify
-import login_test  # 이것은 앞에서 만든 Selenium 스크립트입니다.
+import login_test
 from flask_cors import CORS
 import sqlite3
-# import schedule, threading, time
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# Your existing Flask code...
+# DB 컬럼 정보 (id : INTEGER, 나머지 : TEXT)
+# id: 고유 번호
+# uid: 유저 아이디
+# upw: 유저 비밀번호
+# personnel: 인원
+# selectedDay: 매크로 시작 날짜
+# nextFuture: 14일 뒤 예약일
+# futureTime: 14일 뒤 예약 시간
+# nextSaturday: 10일 뒤 예약일
+# saturdayTime: 10일 뒤 예약 시간
+# nextSunday: 11일 뒤 예약 일
+# sundayTime: 11일 뒤 예약 시간
+# wednesdayCheck: 수요일 예약인지 아닌지 확인용. 수요일이면 '3'
+
+# db에 등록된 예약 정보를 확인 후 매크로 실행, 예약 정보 제거
 
 
 def check_and_delete_reservations():
     try:
-        # Get the current date and time
         current_datetime = datetime.now()
         print("Current Timestamp:", current_datetime)
-        # Get all rows from the Reservation table
         reservation_data = get_reservation_data()
         print(reservation_data)
-        # Iterate through the rows to check conditions and delete if needed
+
+        # 예약 정보 테이블에서 매크로 시작 날짜와 현재 날짜가 동일한 정보가 있는지 확인
         for row in reservation_data:
             selectedDay = datetime.strptime(row[4], '%Y-%m-%d')
-            # next_future_date_str = row[4]  # Assuming nextFuture is a string representing a date
-            # future_time_str = row[5]       # Assuming futureTime is a string representing time
-
-            # # Convert next_future_date_str and future_time_str to datetime objects
-            # year = int(next_future_date_str.split('년')[0].strip())
-            # month = int(next_future_date_str.split('년')[1].split('월')[0].strip())
-            # day = int(next_future_date_str.split('월')[1].split('일')[0].strip())
-
-            # hour, minute = map(int, future_time_str.split(':'))
-            # reservation_datetime = datetime(year, month, day, hour, minute)
-
-            # Combine the date and time to get the complete datetime
-            # reservation_datetime = datetime.combine(next_future_datetime, future_time_datetime.time())
             print(
                 f'current_datetime: {current_datetime}, selectedDay: {selectedDay}')
 
-            # ! 코드 수정: 로그인 진행 시간을 09:00로 지정
-
-            # 테스트 시에 and 이후 제거and current_datetime.hour == 9
-            # and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30
+            # 로그인 진행 시간을 08:59:30로 지정
+            # 테스트 시에는 and 이후 제거
             if current_datetime.day == selectedDay.day and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30:
-                # Perform the login_test method (or any other action you want)
+
+                # 매크로 실행(로그인)
                 cookies, elapsed_time = login_test.login_test(
                     "https://www.debeach.co.kr/",
                     row[1], row[2], row[3], row[5], row[6], row[7], row[8], row[9], row[10], row[11]
                 )
-                # After performing the action, delete the reservation row
+                # db에서 해당 예약 정보 제거
                 delete_reservation_data(row[0])
                 return str(elapsed_time), 200
 
@@ -55,70 +53,61 @@ def check_and_delete_reservations():
         print('Error:', e)
 
 
+# CORS 에러 해결 코드
 app = Flask(__name__)
 CORS(app)
 
-# Function to insert data into the Reservation table
 
-
+# DB에 예약 정보 추가
 def insert_reservation_data(id, pw, personnel, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
     conn = sqlite3.connect("C:/golf_db/golf_db.db")
     cursor = conn.cursor()
 
-    # Prepare the SQL query
     query = """
     INSERT INTO Reservation (uid, upw, personnel, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
-    # Execute the query with the data provided
     cursor.execute(query, (id, pw, personnel, selectedDay, nextFuture, futureTime,
                    nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck))
 
-    # Commit the changes and close the connection
     conn.commit()
     conn.close()
 
 
-# Function to retrieve all rows from the Reservation table
+# 전체 테이블 정보 조회
 def get_reservation_data():
     conn = sqlite3.connect("C:/golf_db/golf_db.db")
     cursor = conn.cursor()
 
-    # Prepare the SQL query
     query = """
     SELECT * FROM Reservation
     """
 
-    # Execute the query and fetch all rows
     cursor.execute(query)
     rows = cursor.fetchall()
 
-    # Close the connection
     conn.close()
     print(f'rows: {rows}')
     return rows
 
-# Function to delete a reservation from the Reservation table
 
-
+# 예약 정보 제거
 def delete_reservation_data(id):
     conn = sqlite3.connect("C:/golf_db/golf_db.db")
     cursor = conn.cursor()
 
-    # Prepare the SQL query
     query = """
     DELETE FROM Reservation WHERE id=?
     """
 
-    # Execute the query with the id provided
     cursor.execute(query, (id,))
 
-    # Commit the changes and close the connection
     conn.commit()
     conn.close()
 
 
+# 예약 등록 컨트롤러
 @app.route('/reservation', methods=['POST'])
 def reservation_route():
     try:
@@ -135,7 +124,6 @@ def reservation_route():
         sundayTime = request.form.get('sundayTime')
         wednesdayCheck = request.form.get('wednesdayCheck')
 
-        # sqlite db 연결
         insert_reservation_data(id, pw, personnel, selectedDay, nextFuture, futureTime,
                                 nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
 
@@ -147,13 +135,13 @@ def reservation_route():
         return jsonify(response), 500
 
 
+# 예약 정보 조회 컨트롤러
 @app.route('/reservation_table', methods=['GET'])
 def reservation_table():
     try:
-        # Get all rows from the Reservation table
         reservation_data = get_reservation_data()
 
-        # Convert the data into a list of dictionaries (JSON format)
+        # db 테이블 정보를 json 형태로 프론트에 반환
         reservations = []
         for row in reservation_data:
             reservation = {
@@ -172,7 +160,6 @@ def reservation_table():
             }
             reservations.append(reservation)
 
-        # Return the data as a JSON response
         return jsonify({'reservations': reservations}), 200
 
     except Exception as e:
@@ -181,37 +168,10 @@ def reservation_table():
         return jsonify(response), 500
 
 
-@app.route('/login', methods=['POST'])
-def login_route():  # 스케줄링 기능 없이 로그인 및 예약 테스트
-    try:
-        print(request.form)
-        id = request.form.get('id')
-        pw = request.form.get('pw')
-        personnel = request.form.get('personnel')
-        selectedDay = request.form.get('selectedDay')
-        nextFuture = request.form.get('nextFuture')
-        nextSaturday = request.form.get('nextSaturday')
-        nextSunday = request.form.get('nextSunday')
-        futureTime = request.form.get('futureTime')
-        wednesdayCheck = request.form.get('wednesdayCheck')
-        saturdayTime = request.form.get('saturdayTime')
-        sundayTime = request.form.get('sundayTime')
-
-        cookies, elapsed_time = login_test.login_test(
-            "https://www.debeach.co.kr/", id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
-
-        return str(elapsed_time), 200
-
-    except Exception as e:
-        error_message = str(e)
-        response = {'success': False, 'error': error_message}
-        return jsonify(response), 500
-
-
+# DB 예약 정보 제거 컨트롤러
 @app.route('/reservation_cancel/<int:id>', methods=['DELETE'])
 def reservation_cancel_route(id):
     try:
-        # Delete the reservation with the provided id
         delete_reservation_data(id)
 
         return jsonify({'success': True}), 200
@@ -222,15 +182,17 @@ def reservation_cancel_route(id):
         return jsonify(response), 500
 
 
+# 스케줄러 적용
 scheduler = BackgroundScheduler(daemon=True)
+# 배포용 코드: 59분 30초마다 매크로 실행 가능한 예약 정보를 탐색함.
 scheduler.add_job(check_and_delete_reservations,
                   trigger='cron', hour='*', minute='59', second='30')
+# 테스트용 코드: 50초가 될 때마다 스케줄링
 # scheduler.add_job(check_and_delete_reservations,
 #                   'interval', seconds=50)
-# scheduler.start()
+scheduler.start()
 
 if __name__ == '__main__':
 
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
-    # Schedule the check_and_delete_reservations function to run every minute
