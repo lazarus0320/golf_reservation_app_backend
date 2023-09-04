@@ -64,7 +64,8 @@ def insert_reservation_data(id, pw, selectedDay, nextFuture, futureTime, nextSat
     cursor = conn.cursor()
 
     query = """
-    INSERT INTO Reservation (uid, upw, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, futurePersonnel, saturdayPersonnel, sundayPersonnel)
+
+    INSERT INTO Reservation (uid, upw, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, , futurePersonnel, saturdayPersonnel, sundayPersonnel)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
