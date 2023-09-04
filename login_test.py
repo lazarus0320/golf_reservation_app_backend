@@ -93,7 +93,7 @@ def login_test(url, id, pw, selectedDay, nextFuture, futureTime, personnel):
     elements = driver.find_elements(By.CLASS_NAME, 'col-xs-5')
 
     # 현재시간이 9시가 될때까지 대기
-    wait_until_9_am()
+    # wait_until_9_am()
 
     # if wednesdayCheck == '3':  # 수요일 예약의 경우
     #     print("수요일 예약 선택")

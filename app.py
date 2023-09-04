@@ -35,7 +35,7 @@ def check_and_delete_reservations():
             # 로그인 진행 시간을 08:59:30로 지정
             # 테스트 시에는 and 이후 제거
             # and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30
-            if current_datetime.day == selectedDay.day and current_datetime.hour == 8 and current_datetime.minute == 59 and current_datetime.second >= 30:
+            if current_datetime.day == selectedDay.day:
                 print('메크로 시작')
                 # 매크로 실행(로그인)
                 cookies, elapsed_time = login_test.login_test(
@@ -216,15 +216,15 @@ def reservation_result():
 
 
 # # 스케줄러 적용
-scheduler = BackgroundScheduler(daemon=True)
-# 배포용 코드: 59분 30초마다 매크로 실행 가능한 예약 정보를 탐색함.
-scheduler.add_job(check_and_delete_reservations,
-                  trigger='cron', hour='*', minute='59', second='30')
-# # 테스트용 코드: 50초가 될 때마다 스케줄링
+# scheduler = BackgroundScheduler(daemon=True)
+# # 배포용 코드: 59분 30초마다 매크로 실행 가능한 예약 정보를 탐색함.
 # scheduler.add_job(check_and_delete_reservations,
-#                   'interval', seconds=50)
-scheduler.start()
-# check_and_delete_reservations()
+#                   trigger='cron', hour='*', minute='59', second='30')
+# # # 테스트용 코드: 50초가 될 때마다 스케줄링
+# # scheduler.add_job(check_and_delete_reservations,
+# #                   'interval', seconds=50)
+# scheduler.start()
+check_and_delete_reservations()
 
 if __name__ == '__main__':
 
