@@ -22,7 +22,7 @@ def wait_until_9_am():
             break
 
 
-def login_test(url, id, pw, selectedDay, nextFuture, futureTime, personnel):
+def login_test(url, id, pw, personnel, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
     # 08:59:30에 로그인 매크로 실행됨.
 
     options = Options()  # 크롬 드라이버 자동 설치 적용됨. 최신 버전으로 항상 호환성 유지됨
@@ -51,7 +51,6 @@ def login_test(url, id, pw, selectedDay, nextFuture, futureTime, personnel):
     )
 
     element.click()
-    print(futureTime)
 
     #  ID ,PW 정보로 로그인 시도
     username_field = WebDriverWait(driver, 10).until(
@@ -95,74 +94,74 @@ def login_test(url, id, pw, selectedDay, nextFuture, futureTime, personnel):
     # 현재시간이 9시가 될때까지 대기
     wait_until_9_am()
 
-    # if wednesdayCheck == '3':  # 수요일 예약의 경우
-    #     print("수요일 예약 선택")
+    if wednesdayCheck == '3':  # 수요일 예약의 경우
+        print("수요일 예약 선택")
 
-    #     print("1. 14일 뒤 수요일 예약 진행")
-    #     isWednesday = True
-    #     # 14일 뒤 수요일 예약 진행
-    #     year = int(nextFuture.split('년')[0].strip())
-    #     month = int(nextFuture.split('년')[1].split('월')[0].strip())
-    #     day = int(nextFuture.split('월')[1].split('일')[0].strip())
+        print("1. 14일 뒤 수요일 예약 진행")
+        isWednesday = True
+        # 14일 뒤 수요일 예약 진행
+        year = int(nextFuture.split('년')[0].strip())
+        month = int(nextFuture.split('년')[1].split('월')[0].strip())
+        day = int(nextFuture.split('월')[1].split('일')[0].strip())
 
-    #     target_date = datetime(year, month, day)
-    #     target_month = target_date.strftime("%m")
-    #     target_day = int(target_date.strftime("%d"))
-    #     print(target_month, target_day)
-    #     if reservation_test(driver, target_day, elements,
-    #                         target_month, futureTime, personnel, isWednesday) == "예약 성공":
-    #         driver.close()
-    #         end_time = time.time()
-    #         elapsed_time = end_time - start_time
-    #         return cookies, elapsed_time
+        target_date = datetime(year, month, day)
+        target_month = target_date.strftime("%m")
+        target_day = int(target_date.strftime("%d"))
+        print(target_month, target_day)
+        if reservation_test(driver, target_day, elements,
+                            target_month, futureTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
 
-    #     print("2. 10일 뒤 토요일 예약 진행")
-    #     year = int(nextSaturday.split('년')[0].strip())
-    #     month = int(nextSaturday.split('년')[1].split('월')[0].strip())
-    #     day = int(nextSaturday.split('월')[1].split('일')[0].strip())
+        print("2. 10일 뒤 토요일 예약 진행")
+        year = int(nextSaturday.split('년')[0].strip())
+        month = int(nextSaturday.split('년')[1].split('월')[0].strip())
+        day = int(nextSaturday.split('월')[1].split('일')[0].strip())
 
-    #     target_date = datetime(year, month, day)
-    #     target_month = target_date.strftime("%m")
-    #     target_day = int(target_date.strftime("%d"))
-    #     print(target_month, target_day)
-    #     if reservation_test(driver, target_day, elements,
-    #                         target_month, saturdayTime, personnel, isWednesday) == "예약 성공":
-    #         driver.close()
-    #         end_time = time.time()
-    #         elapsed_time = end_time - start_time
-    #         return cookies, elapsed_time
+        target_date = datetime(year, month, day)
+        target_month = target_date.strftime("%m")
+        target_day = int(target_date.strftime("%d"))
+        print(target_month, target_day)
+        if reservation_test(driver, target_day, elements,
+                            target_month, saturdayTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
 
-    #     print("3. 11일 뒤 일요일 예약 진행")
-    #     year = int(nextSunday.split('년')[0].strip())
-    #     month = int(nextSunday.split('년')[1].split('월')[0].strip())
-    #     day = int(nextSunday.split('월')[1].split('일')[0].strip())
+        print("3. 11일 뒤 일요일 예약 진행")
+        year = int(nextSunday.split('년')[0].strip())
+        month = int(nextSunday.split('년')[1].split('월')[0].strip())
+        day = int(nextSunday.split('월')[1].split('일')[0].strip())
 
-    #     target_date = datetime(year, month, day)
-    #     target_month = target_date.strftime("%m")
-    #     target_day = int(target_date.strftime("%d"))
-    #     print(target_month, target_day)
-    #     if reservation_test(driver, target_day, elements,
-    #                         target_month, sundayTime, personnel, isWednesday) == "예약 성공":
-    #         driver.close()
-    #         end_time = time.time()
-    #         elapsed_time = end_time - start_time
-    #         return cookies, elapsed_time
+        target_date = datetime(year, month, day)
+        target_month = target_date.strftime("%m")
+        target_day = int(target_date.strftime("%d"))
+        print(target_month, target_day)
+        if reservation_test(driver, target_day, elements,
+                            target_month, sundayTime, personnel, isWednesday) == "예약 성공":
+            driver.close()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            return cookies, elapsed_time
 
-    #     driver.close()
-    #     raise NoAvailableSlotsException('모든 날짜의 예약에 실패했습니다... 예약 가능 날짜가 없습니다.')
+        driver.close()
+        raise NoAvailableSlotsException('모든 날짜의 예약에 실패했습니다... 예약 가능 날짜가 없습니다.')
 
-    # else:  # 수요일 아닌 경우
-    # isWednesday = False
-    year = int(nextFuture.split('년')[0].strip())
-    month = int(nextFuture.split('년')[1].split('월')[0].strip())
-    day = int(nextFuture.split('월')[1].split('일')[0].strip())
+    else:  # 수요일 아닌 경우
+        isWednesday = False
+        year = int(nextFuture.split('년')[0].strip())
+        month = int(nextFuture.split('년')[1].split('월')[0].strip())
+        day = int(nextFuture.split('월')[1].split('일')[0].strip())
 
-    target_date = datetime(year, month, day)
-    target_month = target_date.strftime("%m")
-    target_day = int(target_date.strftime("%d"))
-    print(target_month, target_day)
-    reservation_test(driver, target_day, elements,
-                     target_month, futureTime, personnel, selectedDay, nextFuture)
+        target_date = datetime(year, month, day)
+        target_month = target_date.strftime("%m")
+        target_day = int(target_date.strftime("%d"))
+        print(target_month, target_day)
+        reservation_test(driver, target_day, elements,
+                         target_month, futureTime, personnel, isWednesday)
 
     # 주말의 경우는 프론트에서 예외처리를 해두었음.
 
