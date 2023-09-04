@@ -59,17 +59,17 @@ CORS(app)
 
 
 # DB에 예약 정보 추가
-def insert_reservation_data(id, pw, personnel, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck):
+def insert_reservation_data(id, pw, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, futurePersonnel, saturdayPersonnel, sundayPersonnel):
     conn = sqlite3.connect("C:/golf_db/golf_db.db")
     cursor = conn.cursor()
 
     query = """
-    INSERT INTO Reservation (uid, upw, personnel, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Reservation (uid, upw, selectedDay, nextFuture, futureTime, nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, futurePersonnel, saturdayPersonnel, sundayPersonnel)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
-    cursor.execute(query, (id, pw, personnel, selectedDay, nextFuture, futureTime,
-                   nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck))
+    cursor.execute(query, (id, pw, selectedDay, nextFuture, futureTime,
+                   nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, futurePersonnel, saturdayPersonnel, sundayPersonnel))
 
     conn.commit()
     conn.close()
@@ -114,7 +114,9 @@ def reservation_route():
         print(request.form)
         id = request.form.get('id')
         pw = request.form.get('pw')
-        personnel = request.form.get('personnel')
+        futurePersonnel = request.form.get('futurePersonnel')
+        saturdayPersonnel = request.form.get('saturdayPersonnel')
+        sundayPersonnel = request.form.get('sundayPersonnel')
         selectedDay = request.form.get('selectedDay')
         nextFuture = request.form.get('nextFuture')
         nextSaturday = request.form.get('nextSaturday')
@@ -124,8 +126,8 @@ def reservation_route():
         sundayTime = request.form.get('sundayTime')
         wednesdayCheck = request.form.get('wednesdayCheck')
 
-        insert_reservation_data(id, pw, personnel, selectedDay, nextFuture, futureTime,
-                                nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck)
+        insert_reservation_data(id, pw, selectedDay, nextFuture, futureTime,
+                                nextSaturday, saturdayTime, nextSunday, sundayTime, wednesdayCheck, futurePersonnel, saturdayPersonnel, sundayPersonnel)
 
         return jsonify({'success': True}), 200
 
@@ -148,15 +150,17 @@ def reservation_table():
                 'id': row[0],
                 'uid': row[1],
                 'upw': row[2],
-                'personnel': row[3],
-                'selectedDay': row[4],
-                'nextFuture': row[5],
-                'futureTime': row[6],
-                'nextSaturday': row[7],
-                'saturdayTime': row[8],
-                'nextSunday': row[9],
-                'sundayTime': row[10],
-                'wednesdayCheck': row[11],
+                'selectedDay': row[3],
+                'nextFuture': row[4],
+                'futureTime': row[5],
+                'nextSaturday': row[6],
+                'saturdayTime': row[7],
+                'nextSunday': row[8],
+                'sundayTime': row[9],
+                'wednesdayCheck': row[10],
+                'futurePersonnel': row[11],
+                'saturdayPersonnel': row[12],
+                'sundayPersonnel': row[13]
             }
             reservations.append(reservation)
 
