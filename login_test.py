@@ -33,7 +33,8 @@ def login_test(url, id, pw, selectedDay, nextFuture, futureTime, personnel):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--start-fullscreen')  # 전체화면
 
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    # driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
     driver.get(url)
 
